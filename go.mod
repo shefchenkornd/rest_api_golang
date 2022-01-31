@@ -1,4 +1,4 @@
-module rest_api_pizza
+module rest_api
 
 go 1.17
 

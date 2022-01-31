@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"rest_api_pizza/utils"
+	"rest_api/utils"
 )
 
 const apiPrefix = "/api/v1"

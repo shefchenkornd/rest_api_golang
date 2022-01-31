@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/gorilla/mux"
+import (
+	"github.com/gorilla/mux"
+	"rest_api/handlers"
+)
 
 func BuildBookResource(r *mux.Router, prefix string) {
 	r.HandleFunc(prefix + "/{id}", handlers.GetBookById).Methods("GET")

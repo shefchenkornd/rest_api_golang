@@ -1,8 +1,5 @@
-module rest_api
+module github.com/shefchenkornd/rest_api
 
 go 1.17
 
-require (
-	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
-)
+require github.com/BurntSushi/toml v1.0.0 // indirect

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/BurntSushi/toml"
-	"github.com/shefchenkornd/rest_api/internal/app/rest_api"
+	"github.com/shefchenkornd/rest_api/internal/app/api"
 	"log"
 )
 
@@ -21,14 +21,14 @@ func main() {
 	flag.Parse() // здесь парсятся переменные командной строки
 	log.Println("Starting app...")
 
-	config := rest_api.NewConfig()
+	config := api.NewConfig()
 	_, err := toml.DecodeFile(configPath, config) // Десериализуем значение .toml файла
 	if err != nil {
 		log.Println("Can't find config file. Using default values:", err)
 	}
 	log.Println(config)
 
-	app := rest_api.NewApp(config)
+	app := api.NewApp(config)
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}

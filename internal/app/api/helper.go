@@ -29,6 +29,7 @@ func (app *App) configureStorageField() error {
 	if err := app.storage.Open(); err != nil {
 		return err
 	}
+	app.logger.Infoln("DB connection created!")
 
 	return nil
 }

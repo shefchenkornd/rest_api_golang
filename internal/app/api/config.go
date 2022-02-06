@@ -2,9 +2,9 @@ package api
 
 // Config General instance for App
 type Config struct {
-	BindAddr string	`toml:bind_addr`
-	LoggerLevel string `toml:logger_level`
-	DatabaseURL string `toml: database_url`
+	BindAddr string	`toml:"bind_addr"`
+	LoggerLevel string `toml:"logger_level"`
+	DatabaseURL string `toml:"database_url"`
 }
 
 func NewConfig() *Config {
@@ -14,4 +14,3 @@ func NewConfig() *Config {
 		DatabaseURL: "",
 	}
 }
-

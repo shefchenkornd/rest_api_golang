@@ -22,7 +22,7 @@ func NewApp(config *Config) *App {
 		config: config,
 		logger: logrus.New(),
 		router: mux.NewRouter(),
-		storage: storage.New(config),
+		storage: storage.New(config.DatabaseURL),
 	}
 }
 

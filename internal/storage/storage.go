@@ -6,8 +6,10 @@ import (
 )
 
 type Storage struct {
-	databaseUrl string
-	db     *sql.DB
+	databaseUrl       string
+	db                *sql.DB
+	articleRepository *ArticleRepository
+	userRepository    *UserRepository
 }
 
 func New(databaseUrl string) *Storage {
@@ -35,4 +37,24 @@ func (s *Storage) Open() error {
 // Close connection
 func (s *Storage) Close() {
 	s.db.Close()
+}
+
+func (s *Storage) User() *UserRepository {
+	if s.userRepository == nil {
+		s.userRepository = &UserRepository{
+			storage: s,
+		}
+	}
+
+	return s.userRepository
+}
+
+func (s *Storage) Article() *ArticleRepository {
+	if s.articleRepository == nil {
+		s.articleRepository = &ArticleRepository{
+			storage: s,
+		}
+	}
+
+	return s.articleRepository
 }

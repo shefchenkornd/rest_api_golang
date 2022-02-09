@@ -39,8 +39,8 @@ func (ur *UserRepository) Find(login string) (*models.User, bool, error) {
 	return user, founded, nil
 }
 
-// Select all users
-func (ur *UserRepository) Select() ([]*models.User, error) {
+// SelectAll all users
+func (ur *UserRepository) SelectAll() ([]*models.User, error) {
 	query := fmt.Sprintf("SELECT * FROM %s", tableUser)
 	rows, err := ur.storage.db.Query(query)
 	if err != nil {

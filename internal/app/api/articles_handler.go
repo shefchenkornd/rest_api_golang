@@ -8,12 +8,12 @@ import (
 func (app *App) GetAllArticles(writer http.ResponseWriter, req *http.Request) {
 	initHeader(writer)
 
-	// Лотируем запрос
+	// Логируем запрос
 	app.logger.Infoln("Get all articles")
 
 	articles, err := app.storage.Article().SelectAll()
 	if err != nil {
-		// Лотируем запрос
+		// Логируем запрос
 		app.logger.Infoln("Error while Articles.SelectAll:", err)
 
 		msg := Message{

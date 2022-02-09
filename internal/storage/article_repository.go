@@ -69,7 +69,7 @@ func (ar *ArticleRepository) SelectAll() ([]*models.Article, error) {
 	}
 	defer rows.Close()
 
-	articles := make([]*models.Article, 100)
+	articles := make([]*models.Article, 0)
 	for rows.Next() {
 		article := &models.Article{}
 		if err := rows.Scan(article.Id, article.Title, article.Author, article.Content); err != nil {

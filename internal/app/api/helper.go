@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 var (
@@ -29,10 +28,6 @@ func (app *App) configureRouterField() {
 	app.router.HandleFunc(prefixApi+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
 
 	app.router.HandleFunc(prefixApi+"/user/register", app.UserRegister).Methods("POST")
-
-	app.router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("hello!!!"))
-	})
 }
 
 // configureStorageField Конфигурируем хранилище

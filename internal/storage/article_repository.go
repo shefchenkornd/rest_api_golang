@@ -69,6 +69,7 @@ func (ar *ArticleRepository) SelectAll() ([]*models.Article, error) {
 	}
 	defer rows.Close()
 
+	// Подготовим куда, будем читать данные
 	articles := make([]*models.Article, 0)
 	for rows.Next() {
 		article := &models.Article{}

@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/shefchenkornd/rest_api/internal/models"
 	"log"
@@ -25,18 +27,28 @@ func (ur *UserRepository) Create(u *models.User) (*models.User, error) {
 	return u, nil
 }
 
-// Find user by login
-func (ur *UserRepository) Find(login string) (*models.User, bool, error) {
-	var user *models.User
+// FindByLogin user by login
+func (ur *UserRepository) FindByLogin(login string) (*models.User, bool, error) {
 	founded := false
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE login=$1", tableUser)
-	if err := ur.storage.db.QueryRow(query, login).Scan(&user); err != nil {
+	query := fmt.Sprintf("SELECT id, login FROM %s WHERE login=$1", tableUser)
+	var userId int
+	var userLogin string
+	if err := ur.storage.db.QueryRow(query, login).Scan(&userId, &userLogin); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, false, nil
+		}
+
 		return nil, false, err
 	}
 	founded = true
 
-	return user, founded, nil
+	user := models.User{
+		Id:    userId,
+		Login: userLogin,
+	}
+
+	return &user, founded, nil
 }
 
 // SelectAll all users

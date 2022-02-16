@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/shefchenkornd/rest_api/internal/models"
 	"log"
+	"strings"
 )
 
 // ArticleRepository Хотим, чтобы наше приложение общалось с моделью Article через репозиторий ArticleRepository
@@ -16,6 +17,38 @@ type ArticleRepository struct {
 var (
 	tableArticle = "articles"
 )
+
+// SelectAll select all articles
+func (ar *ArticleRepository) SelectAll() ([]*models.Article, error) {
+	query := fmt.Sprintf("SELECT id, title, author, content FROM %s", tableArticle)
+	rows, err := ar.storage.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Подготовим куда, будем читать данные
+	articles := make([]*models.Article, 0)
+	for rows.Next() {
+		var id int
+		var title string
+		var author string
+		var content string
+		if err := rows.Scan(&id, &title, &author, &content); err != nil {
+			log.Println(err)
+			continue
+		}
+		article := &models.Article{
+			Id:      id,
+			Title:   title,
+			Author:  author,
+			Content: content,
+		}
+		articles = append(articles, article)
+	}
+
+	return articles, nil
+}
 
 // Create new article
 func (ar *ArticleRepository) Create(model *models.Article) (*models.Article, error) {
@@ -55,36 +88,43 @@ func (ar *ArticleRepository) FindById(id int) (*models.Article, bool, error) {
 	return article, founded, nil
 }
 
-// SelectAll select all articles
-func (ar *ArticleRepository) SelectAll() ([]*models.Article, error) {
-	query := fmt.Sprintf("SELECT id, title, author, content FROM %s", tableArticle)
-	rows, err := ar.storage.db.Query(query)
+func (ar *ArticleRepository) Update(oldArticle, NewArticle *models.Article) (*models.Article, error) {
+	rowsMap := make(map[string]string)
+	if NewArticle.Title != "" {
+		// обновляем значение title
+		rowsMap["title"] = NewArticle.Title
+	}
+
+	if NewArticle.Author != "" {
+		// обновляем значение author
+		rowsMap["author"] = NewArticle.Author
+	}
+
+	if NewArticle.Content != "" {
+		// обновляем значение content
+		rowsMap["content"] = NewArticle.Content
+	}
+
+	// query := fmt.Sprintf("UPDATE %s SET content = $1, author = $2 WHERE id = %d", tableArticle, oldArticle.Id)
+	query := fmt.Sprintf("UPDATE %s SET ", tableArticle)
+	for columnName, value := range rowsMap {
+		query = query + columnName + " = '" + value + "', "
+	}
+	// должны удалить лишнюю запятую
+	query = strings.TrimSuffix(query, ", ")
+	query = query + fmt.Sprintf(" WHERE id = %d", oldArticle.Id)
+
+	_, err := ar.storage.db.Exec(query)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	// Подготовим куда, будем читать данные
-	articles := make([]*models.Article, 0)
-	for rows.Next() {
-		var id int
-		var title string
-		var author string
-		var content string
-		if err := rows.Scan(&id, &title, &author, &content); err != nil {
-			log.Println(err)
-			continue
-		}
-		article := &models.Article{
-			Id:      id,
-			Title:   title,
-			Author:  author,
-			Content: content,
-		}
-		articles = append(articles, article)
+	updatedArticle, _, err := ar.FindById(oldArticle.Id)
+	if err != nil {
+		return nil, err
 	}
 
-	return articles, nil
+	return updatedArticle, nil
 }
 
 // DeleteById delete article by id
@@ -104,5 +144,5 @@ func (ar *ArticleRepository) DeleteById(id int) (*models.Article, bool, error) {
 		return nil, false, err
 	}
 
-	return article, found,  nil
+	return article, found, nil
 }

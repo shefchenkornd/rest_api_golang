@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/shefchenkornd/rest_api/internal/models"
 	"net/http"
@@ -121,6 +122,80 @@ func (app *App) CreateArticle(writer http.ResponseWriter, req *http.Request) {
 
 func (app *App) UpdateArticleById(writer http.ResponseWriter, req *http.Request) {
 	initHeader(writer)
+	app.logger.Infoln("Update article by id")
+
+	vars := mux.Vars(req)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.logger.Errorln("Error invalid id param")
+
+		msg := Message{
+			StatusCode: http.StatusBadRequest,
+			Message:    "Invalid id param",
+			IsError:    true,
+		}
+		writer.WriteHeader(msg.StatusCode)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+
+	oldArticle, found, err := app.storage.Article().FindById(id)
+	if err != nil {
+		app.logger.Errorln("Error in storage", err)
+
+		msg := Message{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Internal error. Try later",
+			IsError:    false,
+		}
+		writer.WriteHeader(msg.StatusCode)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+
+	if !found {
+		app.logger.Infoln("Article not found by id:", id)
+
+		msg := Message{
+			StatusCode: http.StatusNotFound,
+			Message:    "Not found article by id",
+			IsError:    false,
+		}
+		writer.WriteHeader(msg.StatusCode)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+
+	var NewArticle models.Article
+	if err := json.NewDecoder(req.Body).Decode(&NewArticle); err != nil {
+		app.logger.Errorln("Invalid json data:", err)
+
+		msg := Message{
+			StatusCode: http.StatusBadRequest,
+			Message:    "Invalid json",
+			IsError:    true,
+		}
+		writer.WriteHeader(msg.StatusCode)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+	fmt.Println(NewArticle)
+
+	updatedArticle, err := app.storage.Article().Update(oldArticle, &NewArticle)
+	if err != nil {
+		app.logger.Errorln("Storage error:", err)
+
+		msg := Message{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Storage error",
+			IsError:    true,
+		}
+		writer.WriteHeader(msg.StatusCode)
+		json.NewEncoder(writer).Encode(msg)
+		return
+	}
+
+	json.NewEncoder(writer).Encode(updatedArticle)
 }
 
 func (app *App) DeleteArticleById(writer http.ResponseWriter, req *http.Request) {

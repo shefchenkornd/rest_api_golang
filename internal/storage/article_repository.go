@@ -91,28 +91,25 @@ func (ar *ArticleRepository) FindById(id int) (*models.Article, bool, error) {
 func (ar *ArticleRepository) Update(oldArticle, NewArticle *models.Article) (*models.Article, error) {
 	rowsMap := make(map[string]string)
 	if NewArticle.Title != "" {
-		// обновляем значение title
 		rowsMap["title"] = NewArticle.Title
 	}
 
 	if NewArticle.Author != "" {
-		// обновляем значение author
 		rowsMap["author"] = NewArticle.Author
 	}
 
 	if NewArticle.Content != "" {
-		// обновляем значение content
 		rowsMap["content"] = NewArticle.Content
 	}
 
-	// query := fmt.Sprintf("UPDATE %s SET content = $1, author = $2 WHERE id = %d", tableArticle, oldArticle.Id)
 	query := fmt.Sprintf("UPDATE %s SET ", tableArticle)
 	for columnName, value := range rowsMap {
-		query = query + columnName + " = '" + value + "', "
+		query += fmt.Sprintf("%s = '%s', ", columnName, value)
 	}
 	// должны удалить лишнюю запятую
 	query = strings.TrimSuffix(query, ", ")
-	query = query + fmt.Sprintf(" WHERE id = %d", oldArticle.Id)
+	query += fmt.Sprintf(" WHERE id = %d", oldArticle.Id)
+	fmt.Println(query)
 
 	_, err := ar.storage.db.Exec(query)
 	if err != nil {

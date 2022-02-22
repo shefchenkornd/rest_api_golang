@@ -43,3 +43,20 @@
 Для работы с JWT токеном будем использовать следующие пакеты:
 * go get -u github.com/auth0/go-jwt-middleware
 * go get -u github.com/form3tech-oss/jwt-go
+
+### Шаг 3. Добавить JWT аутентификацию
+Завернем необходимые HTTP-хендлеры в JWT-декоратор. Для того, чтобы обозначить факт необходимости использования JWT токена
+перед выполнением какого-либо запроса.
+Заверните HTTP-хендлер в декоратор `JWTMiddleware.Handler(h http.Handler) http.Handler`
+```
+app.router.Handle(
+    prefixApi+"/articles/{id}",
+    middleware.JwtMiddleware.Handler(
+        http.HandlerFunc(app.GetArticleById),
+    ),
+).Methods("GET")
+```
+
+
+В postman'e получите JWT токен и используйте его на вкладке "Headers", добавив таким образом:<br>
+`Authorization: Bearer <your_token_from_auth>`

@@ -39,3 +39,7 @@
 Для того чтобы удобно работать с маршрутизатором и не писать с нуля, будем использовать готовую
 библиотеку `github.com/gorilla/mux`:
 `go get -u github.com/gorilla/mux`
+
+Для работы с JWT токеном будем использовать следующие пакеты:
+* go get -u github.com/auth0/go-jwt-middleware
+* go get -u github.com/form3tech-oss/jwt-go

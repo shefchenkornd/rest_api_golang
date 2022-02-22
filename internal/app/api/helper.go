@@ -1,7 +1,9 @@
 package api
 
 import (
+	"github.com/shefchenkornd/rest_api/internal/app/middleware"
 	"github.com/sirupsen/logrus"
+	"net/http"
 )
 
 var (
@@ -22,12 +24,23 @@ func (app *App) configureLoggerField() error {
 // configureRouterField Конфигурируем маршрутизатор
 func (app *App) configureRouterField() {
 	app.router.HandleFunc(prefixApi+"/articles", app.GetAllArticles).Methods("GET")
-	app.router.HandleFunc(prefixApi+"/articles/{id}", app.GetArticleById).Methods("GET")
+
+	// Было до JWT
+	// app.router.HandleFunc(prefixApi+"/articles/{id}", app.GetArticleById).Methods("GET")
+	// С применением JWT
+	app.router.Handle(
+		prefixApi+"/articles/{id}",
+		middleware.JwtMiddleware.Handler(
+			http.HandlerFunc(app.GetArticleById),
+		),
+	).Methods("GET")
+
 	app.router.HandleFunc(prefixApi+"/articles", app.CreateArticle).Methods("POST")
 	app.router.HandleFunc(prefixApi+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
 	app.router.HandleFunc(prefixApi+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
 
 	app.router.HandleFunc(prefixApi+"/user/register", app.UserRegister).Methods("POST")
+	app.router.HandleFunc(prefixApi+"/user/auth", app.UserAuth).Methods("POST")
 }
 
 // configureStorageField Конфигурируем хранилище

@@ -106,7 +106,7 @@ func (ar *ArticleRepository) Update(oldArticle, NewArticle *models.Article) (*mo
 	for columnName, value := range rowsMap {
 		query += fmt.Sprintf("%s = '%s', ", columnName, value)
 	}
-	// должны удалить лишнюю запятую
+	// должны удалить лишнюю запятую в конце query
 	query = strings.TrimSuffix(query, ", ")
 	query += fmt.Sprintf(" WHERE id = %d", oldArticle.Id)
 	fmt.Println(query)

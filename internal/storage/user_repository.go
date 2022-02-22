@@ -31,10 +31,11 @@ func (ur *UserRepository) Create(u *models.User) (*models.User, error) {
 func (ur *UserRepository) FindByLogin(login string) (*models.User, bool, error) {
 	founded := false
 
-	query := fmt.Sprintf("SELECT id, login FROM %s WHERE login=$1", tableUser)
+	query := fmt.Sprintf("SELECT id, login, password FROM %s WHERE login=$1", tableUser)
 	var userId int
 	var userLogin string
-	if err := ur.storage.db.QueryRow(query, login).Scan(&userId, &userLogin); err != nil {
+	var userPassword string
+	if err := ur.storage.db.QueryRow(query, login).Scan(&userId, &userLogin, &userPassword); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, false, nil
 		}
@@ -46,6 +47,7 @@ func (ur *UserRepository) FindByLogin(login string) (*models.User, bool, error) 
 	user := models.User{
 		Id:    userId,
 		Login: userLogin,
+		Password: userPassword,
 	}
 
 	return &user, founded, nil
@@ -71,4 +73,22 @@ func (ur *UserRepository) SelectAll() ([]*models.User, error) {
 	}
 
 	return users, nil
+}
+
+func (ur UserRepository) Auth(u *models.User) (bool, error) {
+	found := false
+	var user models.User
+
+	query := fmt.Sprintf("SELECT login FROM %v where login=$1 and password=$2", tableUser)
+	err := ur.storage.db.QueryRow(query, u.Login, u.Password).Scan(&user.Login)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return found, nil
+		}
+
+		return found, err
+	}
+	found = true
+
+	return found, nil
 }

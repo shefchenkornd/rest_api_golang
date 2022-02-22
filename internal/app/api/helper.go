@@ -23,6 +23,10 @@ func (app *App) configureLoggerField() error {
 
 // configureRouterField Конфигурируем маршрутизатор
 func (app *App) configureRouterField() {
+	app.router.HandleFunc(prefixApi+"/user/register", app.UserRegister).Methods("POST")
+	// роутер для авторизации и получения JWT токена
+	app.router.HandleFunc(prefixApi+"/user/auth", app.UserAuth).Methods("POST")
+
 	app.router.HandleFunc(prefixApi+"/articles", app.GetAllArticles).Methods("GET")
 
 	// Было до JWT
@@ -38,9 +42,6 @@ func (app *App) configureRouterField() {
 	app.router.HandleFunc(prefixApi+"/articles", app.CreateArticle).Methods("POST")
 	app.router.HandleFunc(prefixApi+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
 	app.router.HandleFunc(prefixApi+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
-
-	app.router.HandleFunc(prefixApi+"/user/register", app.UserRegister).Methods("POST")
-	app.router.HandleFunc(prefixApi+"/user/auth", app.UserAuth).Methods("POST")
 }
 
 // configureStorageField Конфигурируем хранилище

@@ -38,11 +38,13 @@
 библиотеку `github.com/gorilla/mux`:
 `go get -u github.com/gorilla/mux`
 
-Для работы с JWT токеном будем использовать следующие пакеты:
-* go get -u github.com/auth0/go-jwt-middleware
-* go get -u github.com/form3tech-oss/jwt-go
-
 ### Шаг 3. JWT аутентификация
+
+Для работы с JWT токеном будем использовать следующие пакеты:
+* `go get -u github.com/auth0/go-jwt-middleware`
+* `go get -u github.com/form3tech-oss/jwt-go`
+
+
 Завернем необходимые HTTP-хендлеры в JWT-декоратор. Для того чтобы обозначить факт необходимости использования JWT токена
 перед выполнением какого-либо запроса.<br />
 Заверните HTTP-хендлер в декоратор `JWTMiddleware.Handler(h http.Handler) http.Handler`
